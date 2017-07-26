@@ -24,7 +24,6 @@ import org.gradle.internal.Factory;
 import org.gradle.internal.event.ListenerBroadcast;
 import org.gradle.internal.logging.config.LoggingRouter;
 import org.gradle.internal.logging.console.AnsiConsole;
-import org.gradle.internal.logging.console.BuildLogLevelFilterRenderer;
 import org.gradle.internal.logging.console.BuildStatusRenderer;
 import org.gradle.internal.logging.console.ColorMap;
 import org.gradle.internal.logging.console.Console;
@@ -82,14 +81,14 @@ public class OutputEventRenderer implements OutputEventListener, LoggingRouter {
         OutputEventListener stdOutChain = new LazyListener(new Factory<OutputEventListener>() {
             @Override
             public OutputEventListener create() {
-                return onNonError(new BuildLogLevelFilterRenderer(new ProgressLogEventGenerator(new StyledTextOutputBackedRenderer(new StreamingStyledTextOutput(stdoutListeners.getSource())), false)));
+                return onNonError(new ProgressLogEventGenerator(new StyledTextOutputBackedRenderer(new StreamingStyledTextOutput(stdoutListeners.getSource())), false));
             }
         });
         formatters.add(stdOutChain);
         OutputEventListener stdErrChain = new LazyListener(new Factory<OutputEventListener>() {
             @Override
             public OutputEventListener create() {
-                return onError(new BuildLogLevelFilterRenderer(new ProgressLogEventGenerator(new StyledTextOutputBackedRenderer(new StreamingStyledTextOutput(stderrListeners.getSource())), false)));
+                return onError(new ProgressLogEventGenerator(new StyledTextOutputBackedRenderer(new StreamingStyledTextOutput(stderrListeners.getSource())), false));
             }
         });
         formatters.add(stdErrChain);
@@ -217,8 +216,7 @@ public class OutputEventRenderer implements OutputEventListener, LoggingRouter {
         final OutputEventListener consoleChain = new ThrottlingOutputEventListener(
             new BuildStatusRenderer(
                 new WorkInProgressRenderer(
-                    new BuildLogLevelFilterRenderer(
-                        new GroupingProgressLogEventGenerator(new StyledTextOutputBackedRenderer(console.getBuildOutputArea()), timeProvider, new PrettyPrefixedLogHeaderFormatter(), false)),
+                    new GroupingProgressLogEventGenerator(new StyledTextOutputBackedRenderer(console.getBuildOutputArea()), timeProvider, new PrettyPrefixedLogHeaderFormatter(), false),
                     console.getBuildProgressArea(), new DefaultWorkInProgressFormatter(consoleMetaData), new ConsoleLayoutCalculator(consoleMetaData)),
                 console.getStatusBar(), console, consoleMetaData, timeProvider),
             timeProvider);
