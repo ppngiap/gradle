@@ -15,10 +15,10 @@
  */
 package org.gradle.internal.progress
 
-import org.gradle.integtests.fixtures.AbstractConsoleFunctionalSpec
+import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 import org.gradle.test.fixtures.ConcurrentTestUtil
 
-class BuildProgressLoggerIntegrationTest extends AbstractConsoleFunctionalSpec {
+class BuildProgressLoggerIntegrationTest extends AbstractIntegrationSpec {
     def "buildSrc task progress is displayed in initialization phase"() {
         given:
         file("buildSrc/build.gradle") << """
@@ -49,7 +49,7 @@ class BuildProgressLoggerIntegrationTest extends AbstractConsoleFunctionalSpec {
         buildFile << "task hello {}"
 
         when:
-        def build = executer.withTasks("hello").start()
+        def build = executer.withRichConsole().withTasks("hello").withArgument("-i").start()
 
         then:
         ConcurrentTestUtil.poll(30) {
